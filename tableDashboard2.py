@@ -71,9 +71,18 @@ def main():
     location = '/tmp/'
     if filename not in os.listdir(location):
         print('Downloading data from S3')
-        client=boto3.client('s3',aws_access_key_id=os.getenv('AWS_AKEY'),aws_secret_access_key=os.getenv('AWS_SKEY'),
-                                region_name='eu-central-1')
-        client.download_file("aus-monash-frankfurt", filename, location + filename)
+        session = boto3.Session(
+            aws_access_key_id=os.getenv('AWS_AKEY'),
+            aws_secret_access_key=os.getenv('AWS_SKEY'),
+            region_name='eu-central-1',
+        )
+        resource = session.resource('s3')
+        my_bucket = resource.Bucket(os.getenv('AWS_BUCKET'))
+        my_bucket.download_file(filename, location + filename)
+
+        # client=boto3.client('s3',aws_access_key_id=os.getenv('AWS_AKEY'),aws_secret_access_key=os.getenv('AWS_SKEY'),
+        #                         region_name='eu-central-1')
+        # client.download_file("aus-monash-frankfurt", filename, location + filename)
 
     print('Finish downloading.')
 
